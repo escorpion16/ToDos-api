@@ -8,68 +8,70 @@ import TodoList from './components/todo-list/todo-list.component';
 import './App.css';
 
 const App = () => {
-	// State
-	const [todos, setTodos] = useState([]);
+  // State
+  const [todos, setTodos] = useState([]);
 
-	const addTodo = async todo => {
-		await axios.post(`http://localhost:4000/`, {
-			content: todo.content,
-		}); // req.body.content
+  const addTodo = async (todo) => {
+    await axios.post(`http://localhost:4000/api/v1/todos/`, {
+      content: todo.content
+    }); // req.body.content
 
-		setTodos(prevState => [...prevState, todo]);
-	};
+    setTodos((prevState) => [...prevState, todo]);
 
-	const fetchTodos = async () => {
-		const res = await axios.get('http://localhost:4000/');
+    console.log(todo);
+  };
 
-		const resTodos = res.data;
-		console.log(resTodos);
-		setTodos(resTodos);
-	};
+  const fetchTodos = async () => {
+    const res = await axios.get(`http://localhost:4000/api/v1/todos`);
 
-	const editTodo = async (id, newContent) => {
-		await axios.patch(`http://localhost:4000/`, {
-			content: newContent,
-		});
+    const resTodos = res.data.data.todos;
+    console.log(resTodos);
+    setTodos(resTodos);
+  };
 
-		setTodos(prevState => {
-			const currentTodos = prevState;
+  const editTodo = async (id, newContent) => {
+    await axios.patch(`http://localhost:4000/api/v1/todos/${id}`, {
+      content: newContent
+    });
 
-			const todoIndex = currentTodos.findIndex(todo => +todo.id === +id);
+    setTodos((prevState) => {
+      const currentTodos = prevState;
 
-			const updatedTodo = currentTodos[todoIndex];
+      const todoIndex = currentTodos.findIndex((todo) => +todo.id === +id);
 
-			updatedTodo.content = newContent;
+      const updatedTodo = currentTodos[todoIndex];
 
-			currentTodos[todoIndex] = updatedTodo;
+      updatedTodo.content = newContent;
 
-			return [...currentTodos];
-		});
-	};
+      currentTodos[todoIndex] = updatedTodo;
 
-	const deleteTodo = async id => {
-		await axios.delete(`http://localhost:4000/`);
+      return [...currentTodos];
+    });
+  };
 
-		setTodos(prevState => {
-			const currentTodos = prevState;
+  const deleteTodo = async (id) => {
+    await axios.delete(`http://localhost:4000/api/v1/todos/${id}`);
 
-			const updatedTodos = currentTodos.filter(todo => +todo.id !== +id);
+    setTodos((prevState) => {
+      const currentTodos = prevState;
 
-			return [...updatedTodos];
-		});
-	};
+      const updatedTodos = currentTodos.filter((todo) => +todo.id !== +id);
 
-	// When component is mounted, fetch todos
-	useEffect(() => {
-		fetchTodos();
-	}, []);
+      return [...updatedTodos];
+    });
+  };
 
-	return (
-		<div className="app">
-			<Form onAddTodo={addTodo} />
-			<TodoList onDeleteTodo={deleteTodo} onEditTodo={editTodo} items={todos} />
-		</div>
-	);
+  // When component is mounted, fetch todos
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  return (
+    <div className="app">
+      <Form onAddTodo={addTodo} />
+      <TodoList onDeleteTodo={deleteTodo} onEditTodo={editTodo} items={todos} />
+    </div>
+  );
 };
 
 export default App;
