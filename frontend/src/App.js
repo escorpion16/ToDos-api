@@ -17,7 +17,7 @@ const App = () => {
     }); // req.body.content
 
     setTodos((prevState) => [...prevState, todo]);
-
+    fetchTodos();
     console.log(todo);
   };
 
